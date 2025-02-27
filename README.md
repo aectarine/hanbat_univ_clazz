@@ -1,3 +1,4 @@
+![OpenJDK](https://developers.redhat.com/sites/default/files/styles/keep_original/public/openjdk-basic-featured-image.png?itok=IOXZF7iv){:width="300px" height="200px"}
 * OpenJDK 17
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
   * 설치:
