@@ -1,5 +1,4 @@
-* OpenJDK 17
-  * <img src="https://developers.redhat.com/sites/default/files/styles/keep_original/public/openjdk-basic-featured-image.png?itok=IOXZF7iv" width="100px"> 
+* OpenJDK 17 
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
   * 설치:
     * 다운로드 및 압축해제
@@ -12,13 +11,11 @@
 
 
 * JMETER: 5.1.1
-  * <img src="https://velog.velcdn.com/images/ghdgurdnjs/post/2431540f-6162-4704-a66f-d96248f0069e/image.png" width="100px">
   * 다운로드: https://archive.apache.org/dist/jmeter/binaries/
   * 실행: apache-jmeter-5.1.1/bin -> jmeter.bat 실행
 
 
 * NGINX: 1.27.4
-  * <img src="https://nginx.org/img/nginx_logo.png" width="100px"> 
   * 다운로드: https://nginx.org/en/download.html
   * 실행: nginx-1.27.4 -> 상단 경로 클릭 -> cmd 입력 -> nginx 입력 및 실행
   * 설정: 
