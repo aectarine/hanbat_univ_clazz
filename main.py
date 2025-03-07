@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, APIRouter
 
-from controller.ai2_controller import router as ai2_router
+from controller.ai_controller import router as ai2_router
 from util.database import init_db
 
 app = FastAPI()
