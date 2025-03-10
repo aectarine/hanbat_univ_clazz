@@ -1,3 +1,14 @@
+* PostgreSQL 설치
+  * 방법 1: Postgres 직접 설치
+    * 다운로드: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads -> Windows x86-64 선택
+  * 방법 2: 도커 허브를 통해 설치
+    * 다운로드: https://www.docker.com/products/docker-hub/
+    * 이미지 다운로드: 도커 허브에서 postgres 검색 및 이미지 pull
+    * 컨테이너 생성 및 실행:
+    ```
+    docker run -d --name test-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
+    ```
+
 * OpenJDK 17 
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
   * 설치:
@@ -67,8 +78,10 @@
   * PM2 설치: cmd -> npm i pm2 -g
   * 등록 및 구동: pm2 start main.py --interpreter python -i 4
   * 정지: pm2 stop all 또는 pm2 stop <ID 또는 앱 이름>
+  * 삭제: pm2 delete all 또는 pm2 stop <ID 또는 앱 이름>
   * 목록 확인: pm2 list
   * 로그 확인: pm2 logs 또는 pm2 logs <ID 또는 앱 이름>
+  * PM2 모니터링: pm2 monit
   * PC 재부팅 시 자동 시작
     * pm2 startup -> 권한 오류 발생하면 복사후 입력 및 엔터
     * pm2 save
