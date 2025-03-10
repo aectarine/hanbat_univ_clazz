@@ -6,7 +6,8 @@
     * 이미지 다운로드: 도커 허브에서 postgres 검색 및 이미지 pull
     * 컨테이너 생성 및 실행:
     ```
-    docker run -d --name test-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
+    docker run -d --name test-postgres -e POSTGRES_USER=postgres \
+    -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
     ```
 
 * OpenJDK 17 
