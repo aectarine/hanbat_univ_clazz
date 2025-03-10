@@ -62,6 +62,17 @@
     include ../my_config/config.conf;
     ```
 
+* PM2
+  * NodeJS 설치: https://nodejs.org/ko/download
+  * PM2 설치: cmd -> npm i pm2 -g
+  * 등록 및 구동: pm2 start main.py --interpreter python -i 4
+  * 정지: pm2 stop all 또는 pm2 stop <ID 또는 앱 이름>
+  * 목록 확인: pm2 list
+  * 로그 확인: pm2 logs 또는 pm2 logs <ID 또는 앱 이름>
+  * PC 재부팅 시 자동 시작
+    * pm2 startup -> 권한 오류 발생하면 복사후 입력 및 엔터
+    * pm2 save
+
 
 
          
