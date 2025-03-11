@@ -25,7 +25,7 @@ running_tasks = {}
 async def find_all(
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(AI_Module))
+    result = await db.execute(select(AI_Module).order_by(AI_Module.id.asc()))
     find_ai_modules = result.scalars().all()
     return [AIModuleResponse.model_validate(ai) for ai in find_ai_modules]
 

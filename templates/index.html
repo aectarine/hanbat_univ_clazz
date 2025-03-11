@@ -23,6 +23,7 @@
             padding: 16px;
             box-shadow: 2px 4px 8px rgba(0,0,0,0.8);
             background: white;
+            margin: 0 10px;
         }
         .card:hover {
             cursor: pointer;
@@ -100,13 +101,46 @@
                     <p><b>♧ 등록일자</b>: ${inserted.substring(0,10)}</p>
                     <p><b>♧ 수정일자</b>: ${updated.substring(0,10)}</p>
                     <div class="button-container">
-                        <button onclick="alert('모듈 구동');">구동</button>
-                        <button onclick="alert('모듈 정지');">정지</button>
-                        <button onclick="alert('모듈 삭제');">삭제</button>
+                        <button onclick="moduleAction('start', '${id}', '${name}')">구동</button>
+                        <button onclick="moduleAction('stop', '${id}', '${name}')">정지</button>
+                        <button onclick="moduleAction('delete', '${id}', '${name}')">삭제</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // 모듈 액션 함수 정의
+        async function moduleAction(action, id, name) {
+            let url = '';
+            let url_del = '';
+            if (action == 'start' || action == 'stop') {
+                url = `/api/ai/${action}/${id}`;
+            } else if (action == 'delete') {
+                url = `/api/ai/stop/${id}`;
+                url_del = `/api/ai?id=${id}`;
+            }
+
+            try {
+                const response = await fetch(url, { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error('API 요청 실패');
+                }
+                await response.json();
+
+                if (action == 'delete') {
+                    const response = await fetch(url_del, { method: 'DELETE' });
+                    if (!response.ok) {
+                        throw new Error('API 요청 실패');
+                    }
+                    await response.json();
+                }
+                // 성공 후 필요한 작업 (예: 페이지 새로고침)
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`${name} 모듈 ${action} 실패: ${error.message}`);
+            }
         }
 
         fetchModules();
