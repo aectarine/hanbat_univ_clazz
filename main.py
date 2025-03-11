@@ -2,17 +2,26 @@ import uvicorn
 from fastapi import FastAPI, APIRouter
 
 from controller.ai_controller import router as ai_router
+from controller.index_controller import router as index_router
 from controller.nginx_controller import router as nginx_router
 from util.database import init_db
 
 app = FastAPI()
 
+# API 라우터 적용
 api_app = APIRouter(prefix='/api')
 
 api_app.include_router(ai_router)
 api_app.include_router(nginx_router)
 
 app.include_router(api_app)
+
+# HTML 라우터 적용
+page_app = APIRouter()
+
+page_app.include_router(index_router)
+
+app.include_router(page_app)
 
 
 @app.on_event('startup')

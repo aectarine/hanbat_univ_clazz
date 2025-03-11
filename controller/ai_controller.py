@@ -11,6 +11,7 @@ from model.enums import StatusType
 from model.models import AI_Module
 from util.database import get_db
 
+# http://localhost:8001/api/ai
 router = APIRouter(prefix='/ai')
 
 running_tasks = {}

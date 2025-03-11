@@ -1,9 +1,12 @@
+* DockerHub 설치
+  * 다운로드: https://www.docker.com/products/docker-desktop/
+
 * PostgreSQL 설치
   * 방법 1: Postgres 직접 설치
     * 다운로드: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads -> Windows x86-64 선택
   * 방법 2: 도커 허브를 통해 설치
     * 다운로드: https://www.docker.com/products/docker-hub/
-    * 이미지 다운로드: 도커 허브에서 postgres 검색 및 이미지 pull
+    * 이미지 다운로드: 도커 허브에서 postgres:latest 검색 및 이미지 pull
     * 컨테이너 생성 및 실행:
     ```
     docker run -d --name test-postgres -e POSTGRES_USER=postgres \
@@ -30,6 +33,7 @@
 * NGINX: 1.27.4
   * 다운로드: https://nginx.org/en/download.html
   * 실행: nginx-1.27.4 -> 상단 경로 클릭 -> cmd 입력 -> nginx 입력 및 실행
+  * 중지: nginx -s stop
   * 설정: 
     * my_config 폴더 생성 -> 마우스 우클릭 -> 새로 만들기 -> 텍스트 문서 -> 새 텍스트 문서.txt 를 config.conf 로 변경
     * config.conf 우클릭 -> 메모장에서 편집 -> 아래 내용 입력 및 저장
@@ -106,4 +110,6 @@
     * https://www.inflearn.com/
   * 렛플: 사이드 프로젝트 관련 사이트
     * https://letspl.me/
+  * 홀라월드: 사이드 프로젝트 관련 사이트
+    * https://holaworld.io/
          
