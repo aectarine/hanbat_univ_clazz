@@ -77,7 +77,10 @@
 * PM2
   * NodeJS 설치: https://nodejs.org/ko/download
   * PM2 설치: cmd -> npm i pm2 -g
-  * 등록 및 구동: pm2 start main.py --interpreter python -i 4
+  * 등록 및 구동: 
+    * pm2 start main.py --interpreter python
+    * pm2 start main1.py --interpreter python
+    * pm2 start main2.py --interpreter python
   * 정지: pm2 stop all 또는 pm2 stop <ID 또는 앱 이름>
   * 삭제: pm2 delete all 또는 pm2 stop <ID 또는 앱 이름>
   * 목록 확인: pm2 list
@@ -86,7 +89,21 @@
   * PC 재부팅 시 자동 시작
     * pm2 startup -> 권한 오류 발생하면 복사후 입력 및 엔터
     * pm2 save
+  * 참고
+    * PM2에서 파이썬 프로그램이 cluster 모드로 정상 작동하지 않는 문제가 있음
 
 
-
+* 참고 사이트
+  * TIOBE: 인기언어 지표 순위 사이트
+    * https://www.tiobe.com/tiobe-index/
+  * TechEmpower: 웹 프레임워크 비교 순위 사이트
+    * https://www.techempower.com/benchmarks
+  * 요즘 IT: 쉽게 재미있게 읽을 수 있는 IT 관련 매거진
+    * https://yozm.wishket.com/magazine/
+  * TheMiilk: 실리콘밸리의 최신 AI 뉴스
+    * https://www.themiilk.com/
+  * 인프런: 무료, 유료 온라인 강의 사이트
+    * https://www.inflearn.com/
+  * 렛플: 사이드 프로젝트 관련 사이트
+    * https://letspl.me/
          
