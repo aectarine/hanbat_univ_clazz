@@ -78,7 +78,7 @@
     include ../my_config/config.conf;
     ```
 
-* PM2
+* PM2 (실습X)
   * NodeJS 설치: https://nodejs.org/ko/download
   * PM2 설치: cmd -> npm i pm2 -g
   * 등록 및 구동: 
