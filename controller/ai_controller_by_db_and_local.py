@@ -38,7 +38,7 @@ async def find_one(
         db: AsyncSession = Depends(get_db)
 ):
     # 1.Native Query
-    # query = text('SELECT * FROM ai_module AS ai where ai.id = :id ORDER BY ai.id ASC')
+    # query = text('SELECT * FROM module AS ai where ai.id = :id ORDER BY ai.id ASC')
     # result = await db.execute(query, {'id': id})
     # find_ai_module = result.fetchone()
 
@@ -58,7 +58,7 @@ async def create(
     # 1.Insert - value 방식
     # query = insert(AI_Module).values(name=name, version=version).returning(AI_Module)
     # result = await db.execute(query)
-    # ai_module = result.scalar_one()
+    # module = result.scalar_one()
     # await db.commit()
 
     # 2.간편 방식
