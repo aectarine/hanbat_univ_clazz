@@ -1,10 +1,10 @@
 import uvicorn
+from controller.ai_controller_by_db_and_local import router as ai_router
 from fastapi import FastAPI, APIRouter
 
-from controller.ai_controller import router as ai_router
 from controller.index_controller import router as index_router
 from controller.nginx_controller import router as nginx_router
-from util.database import init_db
+from util.init_database import init_db
 
 app = FastAPI()
 

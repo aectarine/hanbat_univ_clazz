@@ -1,17 +1,17 @@
 import asyncio
 import functools
-from asyncio import sleep
 
 from fastapi import APIRouter, status as res_status, Depends, Body, HTTPException, Query, Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from domain.AIModuleRequest import AIModuleRequest
 from domain.AIModuleResponse import AIModuleResponse
 from model.enums import StatusType
 from model.models import AI_Module
-from util.database import get_db
+from util.init_database import get_db
 
-# http://localhost:8001/api/ai
+# http://localhost:8000/api/ai
 router = APIRouter(prefix='/ai')
 
 running_tasks = {}
@@ -20,7 +20,7 @@ running_tasks = {}
 # SQLAlchemy 2.0v
 
 
-# http://localhost:8001/api/ai
+# http://localhost:8000/api/ai
 @router.get('')
 async def find_all(
         db: AsyncSession = Depends(get_db)
@@ -30,30 +30,38 @@ async def find_all(
     return [AIModuleResponse.model_validate(ai) for ai in find_ai_modules]
 
 
-# http://localhost:8001/api/ai?id={id}
-# http://localhost:8001/api/ai?id=1
+# http://localhost:8000/api/ai?id={id}
+# http://localhost:8000/api/ai?id=1
 @router.get('/{id}')
 async def find_one(
         id: int = Path(...),
         db: AsyncSession = Depends(get_db)
 ):
+    # 1.Native Query
+    # query = text('SELECT * FROM ai_module AS ai where ai.id = :id ORDER BY ai.id ASC')
+    # result = await db.execute(query, {'id': id})
+    # find_ai_module = result.fetchone()
+
+    # 2.ORM
     result = await db.execute(select(AI_Module).where(AI_Module.id == id).order_by(AI_Module.id.asc()))
     find_ai_module = result.scalar_one_or_none()
     return AIModuleResponse.model_validate(find_ai_module)
 
 
-# http://localhost:8001/api/ai
+# http://localhost:8000/api/ai
 @router.post('')
 async def create(
         name: str = Body(...),
         version: str = Body(...),
         db: AsyncSession = Depends(get_db)
 ):
+    # 1.Insert - value 방식
     # query = insert(AI_Module).values(name=name, version=version).returning(AI_Module)
     # result = await db.execute(query)
     # ai_module = result.scalar_one()
     # await db.commit()
 
+    # 2.간편 방식
     ai_module = AI_Module(name=name, version=version)
     db.add(ai_module)
     await db.commit()
@@ -61,28 +69,30 @@ async def create(
     return AIModuleResponse.model_validate(ai_module)
 
 
-# http://localhost:8001/api/ai/{id}
-# http://localhost:8001/api/ai/1
+# http://localhost:8000/api/ai/{id}
+# http://localhost:8000/api/ai/1
 @router.put('/{id}')
 async def modify(
         id: int,
-        name: str = Body(...),
-        version: str = Body(...),
+        # name: str = Body(...),
+        # version: str = Body(...),
+        ai_module_request: AIModuleRequest,
         db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(select(AI_Module).where(AI_Module.id == id))
     find_ai_module = result.scalar_one_or_none()
     if find_ai_module is None:
         raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND)
-    find_ai_module.name = name
-    find_ai_module.version = version
+
+    find_ai_module.name = ai_module_request.name
+    find_ai_module.version = ai_module_request.version
     await db.commit()
     await db.refresh(find_ai_module)
     return AIModuleResponse.model_validate(find_ai_module)
 
 
-# http://localhost:8001/api/ai?id={id}
-# http://localhost:8001/api/ai?id=1
+# http://localhost:8000/api/ai?id={id}
+# http://localhost:8000/api/ai?id=1
 @router.delete('')
 async def delete(
         id: int = Query(...),
@@ -98,23 +108,23 @@ async def delete(
 
 
 async def ai_module(id: int, name: str):
-    print(f'{id}번 {name} 모듈 구동 시작...')
-    for i in range(0, 10000000000000):
+    print(f'===> {id}번 {name} 모듈 구동 시작...')
+    for i in range(0, 1000000000):  # 숫자를 줄여서 예시
         if i % 1000000 == 0:
-            print(f'{id}번 {name} 모듈 구동중...')
-        await sleep(0)
-    print(f'{id}번 {name} 모듈 구동 완료...')
+            print(f'===> {id}번 {name} 모듈 구동중...')
+        await asyncio.sleep(0)  # I/O 대기 중에 CPU를 풀어줌
+    print(f'===> {id}번 {name} 모듈 구동 완료...')
 
 
 def callback(task, module):
     try:
         result = task.result()
-        print(f'모듈 {module.name}이(가) 완료되었습니다')
-        print(f'결과: {result}')
+        print(f'===> {module.id}번 {module.name} 모듈 완료')
+        print(f'===> 결과: {result}')
     except asyncio.CancelledError:
-        print(f'모듈 {module.name}이(가) 정지되었습니다')
+        print(f'===> {module.id}번 {module.name} 모듈 정지됨')
     except Exception as e:
-        print(f'모듈 {module.name}이(가) 오류가 발생했습니다: {e}')
+        print(f'===> {module.id}번 {module.name} 모듈 오류 발생: {e}')
 
 
 @router.get('/start/{id}')
@@ -144,22 +154,21 @@ async def stop(
         id: int,
         db: AsyncSession = Depends(get_db)
 ):
-    # 모듈 조회
     result = await db.execute(select(AI_Module).filter(AI_Module.id == id))
     find_module = result.scalar_one_or_none()
     if find_module is None:
-        return f'{id} 모듈이 없습니다'
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 존재하지 않습니다')
 
-    # 모듈 정지
     task = running_tasks.get(id)
     if task is None:
-        return f'{id} 모듈이 실행중이지 않습니다'
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 실행 중이지 않습니다')
 
     task.cancel()
     running_tasks.pop(id, None)
 
     find_module.status = StatusType.STOP
+    name = find_module.name
     await db.commit()
     await db.refresh(find_module)
 
-    return f'{id}번 모듈이 정지되었습니다'
+    return f'{id}번 {name} 모듈 정지'

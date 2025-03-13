@@ -9,8 +9,7 @@
     * 이미지 다운로드: 도커 허브에서 postgres:latest 검색 및 이미지 pull
     * 컨테이너 생성 및 실행:
     ```
-    docker run -d --name test-postgres -e POSTGRES_USER=postgres \
-    -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
+    docker run -d --name local_postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
     ```
 
 * OpenJDK 17 
@@ -97,6 +96,79 @@
     * PM2에서 파이썬 프로그램이 cluster 모드로 정상 작동하지 않는 문제가 있음
 
 
+* 도커 스웜을 이용한 로드밸런스
+  * 준비
+    * 현재 디렉토리 이동 및 CMD 실행 
+    * Dockerfile 준비
+    ```
+    FROM python:3.8-slim
+    
+    WORKDIR /app
+    
+    COPY requirements.txt .
+    RUN pip install --upgrade pip
+    RUN pip install -r requirements.txt
+    
+    COPY . .
+    ```
+    * requirements.txt 준비
+    ```
+    annotated-types==0.6.0
+    anyio==4.2.0
+    async-timeout==4.0.3
+    asyncpg==0.29.0
+    click==8.1.7
+    colorama==0.4.6
+    exceptiongroup==1.2.0
+    fastapi==0.112.2
+    greenlet==3.0.1
+    h11==0.14.0
+    idna==3.7
+    jinja2==3.1.4
+    markupsafe==2.1.3
+    pip==24.2
+    pydantic==2.8.2
+    pydantic-core==2.20.1
+    setuptools==75.1.0
+    sniffio==1.3.0
+    sqlalchemy==1.4.51
+    starlette==0.38.2
+    typing-extensions==4.11.0
+    uvicorn==0.20.0
+    wheel==0.44.0
+    redis==3.5.3
+    ```
+  * util/database.py의 DB_URL의 IP 변경
+    * DB_URL = 'postgresql+asyncpg://postgres:0000@<Postgres 도커 스웜 서비스 명=postgres_service>:5432/postgres'
+  * 이미지 빌드
+    * docker build -t hanbat:latest .
+  * 도커 스웜 초기화
+    * docker swarm init --advertise-addr 127.0.0.1
+  * 도커 스웜 네트워크 그룹 생성
+    * docker network create -d overlay --opt com.docker.network.driver.mtu=1450 hanbat_network
+  * 도커 스웜 네트워크 조회
+    * docker network ls 
+  * 도커 스웜 서비스 등록
+    * [docker service create --name redis_service --network hanbat_network -p 6379:6379 redis:latest] 
+    * docker service create --name postgres_service --network hanbat_network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 postgres:latest
+    * docker service create --name hanbat_service --network hanbat_network -p 8000:8000 --replicas 3 hanbat:latest
+  * 도커 스웜 서비스 목록 조회
+    * docker service ls
+  * 도커 스웜 서비스 정지
+    * docker service scale hanbat_service=0 또는 docker service update --replicas=0 hanbat_service
+  * 도커 스웜 서비스 삭제
+    * docker service rm hanbat_service
+  * 참고
+    * 특정 이미지의 컨테이너 삭제
+    * docker rm $(docker ps -a --filter ancestor=<이미지명>:<태그>)
+
+
+컨테이너 IP 확인: docker inspect 46c5
+docker run -d --name local_postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
+docker run -d --name local_redis -p 6379:6379 redis:latest
+docker run -d --name local_hanbat -p 8000:8000 hanbat:latest
+
+
 * 참고 사이트
   * TIOBE: 인기언어 지표 순위 사이트
     * https://www.tiobe.com/tiobe-index/
@@ -112,4 +184,3 @@
     * https://letspl.me/
   * 홀라월드: 사이드 프로젝트 관련 사이트
     * https://holaworld.io/
-         

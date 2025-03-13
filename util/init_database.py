@@ -2,7 +2,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DB_URL = 'postgresql+asyncpg://postgres:0000@localhost/postgres'
+# 일반 테스트용
+DB_URL = 'postgresql+asyncpg://postgres:0000@localhost:5432/postgres'
+
+# docker swarm 테스트용
+# DB_URL = 'postgresql+asyncpg://postgres:0000@postgres_service:5432/postgres'
+
 ENGINE = create_async_engine(DB_URL, echo=True)
 AsyncSessionLocal = sessionmaker(bind=ENGINE, class_=AsyncSession, autocommit=False, autoflush=False)
 Base = declarative_base()
