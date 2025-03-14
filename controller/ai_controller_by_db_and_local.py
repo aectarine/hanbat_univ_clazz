@@ -25,8 +25,8 @@ running_tasks = {}
 async def find_all(
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(AI_Module).order_by(AI_Module.id.asc()))
-    find_ai_modules = result.scalars().all()
+    rs = await db.execute(select(AI_Module).order_by(AI_Module.id.asc()))
+    find_ai_modules = rs.scalars().all()
     return [AIModuleResponse.model_validate(ai) for ai in find_ai_modules]
 
 
@@ -43,8 +43,8 @@ async def find_one(
     # find_ai_module = result.fetchone()
 
     # 2.ORM
-    result = await db.execute(select(AI_Module).where(AI_Module.id == id).order_by(AI_Module.id.asc()))
-    find_ai_module = result.scalar_one_or_none()
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id).order_by(AI_Module.id.asc()))
+    find_ai_module = rs.scalar_one_or_none()
     return AIModuleResponse.model_validate(find_ai_module)
 
 
@@ -62,11 +62,11 @@ async def create(
     # await db.commit()
 
     # 2.간편 방식
-    ai_module = AI_Module(name=name, version=version)
-    db.add(ai_module)
+    new_ai_module = AI_Module(name=name, version=version)
+    db.add(new_ai_module)
     await db.commit()
-    await db.refresh(ai_module)
-    return AIModuleResponse.model_validate(ai_module)
+    await db.refresh(new_ai_module)
+    return AIModuleResponse.model_validate(new_ai_module)
 
 
 # http://localhost:8000/api/ai/{id}
@@ -79,8 +79,8 @@ async def modify(
         ai_module_request: AIModuleRequest,
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(AI_Module).where(AI_Module.id == id))
-    find_ai_module = result.scalar_one_or_none()
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
+    find_ai_module = rs.scalar_one_or_none()
     if find_ai_module is None:
         raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND)
 
@@ -98,8 +98,8 @@ async def delete(
         id: int = Query(...),
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(AI_Module).where(AI_Module.id == id))
-    find_ai_module = result.scalar_one_or_none()
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
+    find_ai_module = rs.scalar_one_or_none()
     if find_ai_module is None:
         raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND)
     await db.delete(find_ai_module)
@@ -118,9 +118,9 @@ async def ai_module(id: int, name: str):
 
 def callback(task, module):
     try:
-        result = task.result()
+        rs = task.result()
         print(f'===> {module.id}번 {module.name} 모듈 완료')
-        print(f'===> 결과: {result}')
+        print(f'===> 결과: {rs}')
     except asyncio.CancelledError:
         print(f'===> {module.id}번 {module.name} 모듈 정지됨')
     except Exception as e:
@@ -133,8 +133,8 @@ async def start(
         db: AsyncSession = Depends(get_db)
 ):
     # 모듈 조회
-    result = await db.execute(select(AI_Module).filter(AI_Module.id == id))
-    find_module = result.scalar_one_or_none()
+    rs = await db.execute(select(AI_Module).filter(AI_Module.id == id))
+    find_module = rs.scalar_one_or_none()
     if find_module is None:
         return f'{id}번 {find_module.name} 모듈이 없습니다'
 
@@ -154,8 +154,8 @@ async def stop(
         id: int,
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(AI_Module).filter(AI_Module.id == id))
-    find_module = result.scalar_one_or_none()
+    rs = await db.execute(select(AI_Module).filter(AI_Module.id == id))
+    find_module = rs.scalar_one_or_none()
     if find_module is None:
         raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 존재하지 않습니다')
 

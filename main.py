@@ -1,3 +1,5 @@
+import asyncio
+
 import uvicorn
 # from controller.ai_controller_by_db_and_local import router as ai_router
 from controller.ai_controller_by_db_and_redis import router as ai_router
@@ -6,6 +8,7 @@ from fastapi import FastAPI, APIRouter
 from controller.index_controller import router as index_router
 from controller.nginx_controller import router as nginx_router
 from util.init_database import init_db
+from util.init_redis import init_redis, redis_listener
 
 app = FastAPI()
 
@@ -27,10 +30,8 @@ app.include_router(page_app)
 
 @app.on_event('startup')
 async def startup_event():
-    await init_db()
-    # for task in running_tasks.values():
-    #     task.cancel()  # 모든 실행 중인 작업 취소
-    # await asyncio.gather(*running_tasks.values(), return_exceptions=True)  # 모든 작업이 취소될 때까지 대기
+    await asyncio.gather(init_db(), init_redis())
+    asyncio.create_task(redis_listener())
 
 
 if __name__ == '__main__':
