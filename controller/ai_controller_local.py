@@ -15,6 +15,7 @@ module_list = list()
 # http://localhost:8000/api/ai
 @router.get('')
 async def find_all():
+    raise Exception('에러!!')
     result = [
         {
             'id': module['id'],

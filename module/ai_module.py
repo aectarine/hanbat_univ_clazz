@@ -12,7 +12,7 @@ async def ai_module(id: int, name: str):
     print(f'===> {id}번 {name} 모듈 구동 완료...')
 
 
-def ai_module_callback(task, id, name):
+def ai_module_callback(task, id:int, name: str):
     try:
         result = task.result()
         print(f'===> {id}번 {name} 모듈 완료')

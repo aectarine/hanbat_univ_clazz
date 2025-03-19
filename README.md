@@ -1,5 +1,33 @@
+# 1. AI 모듈 실습 1 (DB 사용 X)
+## 1-1. 프로그램 설치
+* Pycharm 설치
+  * 다운로드: https://www.jetbrains.com/ko-kr/pycharm/
+
+
+* Anaconda 설치
+  * 다운로드: https://www.anaconda.com/download/success
+  * VSCode 환경 접속: conda activate [환경 명칭]
+
+
+* 패키지 설치
+  * uvicorn, fastapi, jinja2
+
+## 1-2. main_local 프로그램 구조
+### 1) AI 모듈 CRUD
+![img.png](imgs/img_1_1.png)
+### 2) AI 모듈 구동
+![img.png](imgs/img_1_2.png)
+### 3) AI 모듈 정지
+![img.png](imgs/img_1_3.png)
+
+## 1-3. main_local.py 실습
+
+# 2. AI 모듈 실습 2 (PostgreSQL, Redis 사용)
+## 2-1. 프로그램 설치
+
 * DockerHub 설치
   * 다운로드: https://www.docker.com/products/docker-desktop/
+
 
 * PostgreSQL 설치
   * 방법 1: Postgres 직접 설치
@@ -11,6 +39,34 @@
     ```
     docker run -d --name local_postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
     ```
+    
+
+* PGAdmin 설치
+  * 다운로드: https://www.postgresql.org/ftp/pgadmin/pgadmin4/v9.1/windows/
+
+
+* Redis 설치
+  * 방법: 도커 허브를 통해 설치
+  * 이미지 다운로드: 도커 허브에서 redis:latest 검색 및 이미지 pull
+  * 컨테이너 생성 및 실행:
+  ```
+  docker run -d --name local_redis -p 6379:6379 redis:latest
+  ```
+
+* 패키지 설치
+  * uvicorn, fastapi, jinja2
+
+## 2-2. main_redis 프로그램 구조
+### 1) AI 모듈 CRUD
+![img.png](imgs/img_1_1.png)
+![img.png](imgs/img_2_1.png)
+### 2) AI 모듈 구동
+![img.png](imgs/img_1_2.png)
+![img_1.png](imgs/img_2_2.png)
+### 3) AI 모듈 정지
+![img.png](imgs/img_1_3.png)
+![img.png](imgs/img_2_3.png)
+## 1-3. main_local.py 실습
 
 * OpenJDK 17 
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
