@@ -9,6 +9,10 @@
   * VSCode 환경 접속: conda activate [환경 명칭]
 
 
+* Postman 설치
+  * 다운로드: https://www.postman.com/downloads/
+
+
 * 패키지 설치
   * uvicorn, fastapi, jinja2
 
@@ -22,8 +26,70 @@
 
 ## 1-3. main_local.py 실습
 
-# 2. AI 모듈 실습 2 (PostgreSQL, Redis 사용)
+# 2. NginX 실습
 ## 2-1. 프로그램 설치
+
+* NginX 설치
+  * 다운로드: https://nginx.org/en/download.html
+  * 실행: nginx-1.27.4 폴더 -> 상단 경로 클릭 -> cmd 입력 -> nginx 입력 및 실행
+  * 중지: nginx-1.27.4 폴더 -> 상단 경로 클릭 -> cmd 입력 -> nginx -s stop 입력 및 실행
+  * 설정: 
+    * my_config 폴더 생성 -> 마우스 우클릭 -> 새로 만들기 -> 텍스트 문서 -> 새 텍스트 문서.txt 를 config.conf 로 변경
+    * config.conf 우클릭 -> 메모장에서 편집 -> 아래 내용 입력 및 저장
+    ```
+      upstream my_server {
+        least_conn;
+        server localhost:8000;
+        server localhost:8001;
+        server localhost:8002;
+      }
+
+      server {
+        listen 8010;
+        server_name localhost;
+  
+        location / {
+          proxy_pass http://my_server;
+          
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Real-Port $remote_port;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-NginX-Proxy true;
+
+          # 타임아웃 설정 추가
+          proxy_connect_timeout 300;
+          proxy_send_timeout 300;
+          proxy_read_timeout 300;
+          
+          # 버퍼 크기 설정
+          proxy_buffer_size 128k;
+          proxy_buffers 4 256k;
+          proxy_busy_buffers_size 256k;
+          
+          # 프록시 응답 버퍼링 활성화
+          proxy_buffering on;
+      }
+    }
+    ```
+    * nginx-1.27.4 -> conf 폴더 이동 -> nginx.conf 우클릭 -> 메모장에서 편집 -> 맨 하단 } 윗줄에 다음 추가
+    ```
+    include ../my_config/config.conf;
+    ```
+    
+## 2-2. 로드밸런스 구조
+![img.png](imgs/img_1_1.png)
+![img.png](imgs/img_2_1.png)
+
+## 2-3. 로드밸런스 적용 실습
+
+## 2-4. 기존 프로젝트의 문제점
+### 1) 서버가 3개로 늘어나서, 서버의 Task를 관리하는 리스트를 공유할 수 없음
+### 2) 공유되지 않은 변수로 인하여, AI 모듈 구동/중단 API 요청이 정상적으로 처리되지 않음
+### 3) 동일한 AI 모듈이 각 서버에서 중복적으로 구동/중단 문제 발생
+
+# 3. AI 모듈 실습 3 (PostgreSQL, Redis 사용)
+## 3-1. 프로그램 설치
 
 * DockerHub 설치
   * 다운로드: https://www.docker.com/products/docker-desktop/
@@ -54,9 +120,9 @@
   ```
 
 * 패키지 설치
-  * uvicorn, fastapi, jinja2
+  * redis-py, sqlalchemy, asyncpg
 
-## 2-2. main_redis 프로그램 구조
+## 3-2. main_redis 프로그램 구조
 ### 1) AI 모듈 CRUD
 ![img.png](imgs/img_1_1.png)
 ![img.png](imgs/img_2_1.png)
@@ -66,7 +132,8 @@
 ### 3) AI 모듈 정지
 ![img.png](imgs/img_1_3.png)
 ![img.png](imgs/img_2_3.png)
-## 1-3. main_local.py 실습
+## 3-3. main_redis.py 실습
+
 
 * OpenJDK 17 
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
