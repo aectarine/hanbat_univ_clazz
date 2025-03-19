@@ -12,12 +12,12 @@ async def ai_module(id: int, name: str):
     print(f'===> {id}번 {name} 모듈 구동 완료...')
 
 
-def ai_module_callback(task, module):
+def ai_module_callback(task, id, name):
     try:
         result = task.result()
-        print(f'===> {module.id}번 {module.name} 모듈 완료')
+        print(f'===> {id}번 {name} 모듈 완료')
         print(f'===> 결과: {result}')
     except asyncio.CancelledError:
-        print(f'===> {module.id}번 {module.name} 모듈 정지됨')
+        print(f'===> {id}번 {name} 모듈 정지됨')
     except Exception as e:
-        print(f'===> {module.id}번 {module.name} 모듈 오류 발생: {e}')
+        print(f'===> {id}번 {name} 모듈 오류 발생: {e}')

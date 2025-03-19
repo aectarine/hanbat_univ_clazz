@@ -11,10 +11,10 @@ async def init_redis():
     try:
         global redis
         # 일반 테스트용
-        # redis = Redis(host='localhost', port=6379, decode_responses=True)
+        redis = Redis(host='localhost', port=6379, decode_responses=True)
 
         # docker swarm 테스트용
-        redis = Redis(host='redis_service', port=6379, db=0)
+        # redis = Redis(host='redis_service', port=6379, db=0)
 
         if redis is None:
             print('Redis is not connected')

@@ -31,8 +31,8 @@ async def find_all(
     return [AIModuleResponse.model_validate(ai) for ai in find_ai_modules]
 
 
-# http://localhost:8000/api/ai?id={id}
-# http://localhost:8000/api/ai?id=1
+# http://localhost:8000/api/ai/{id}
+# http://localhost:8000/api/ai/1
 @router.get('/{id}')
 async def find_one(
         id: int = Path(...),
