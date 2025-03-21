@@ -2,9 +2,6 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, Enum
 
-from model.enums import StatusType
-from util.init_database import Base
-
 
 class AI_Module(Base):
     __tablename__ = 'ai_module'

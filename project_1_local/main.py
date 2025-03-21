@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI, APIRouter
 
-from project_1.controller.ai_controller_local import ai_router
-from project_1.controller.index_controller import index_router
+from project_1_local.controller.ai_controller_local import ai_router
+from project_1_local.controller.index_controller import index_router
 
 app = FastAPI()
 
@@ -16,4 +16,4 @@ app.include_router(api_app)
 app.include_router(page_app)
 
 if __name__ == '__main__':
-    uvicorn.run(app='main_local:app', host='0.0.0.0', port=8000, reload=True)
+    uvicorn.run(app='main:app', host='0.0.0.0', port=8000, reload=True)

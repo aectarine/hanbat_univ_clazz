@@ -5,7 +5,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Path, Body
 
-from project_1.module.ai_module import ai_module, ai_module_callback
+from project_1_local.module.ai_module import ai_module, ai_module_callback
 
 ai_router = APIRouter(prefix='/ai')
 
@@ -79,6 +79,7 @@ async def modify(
         if module['id'] == id:
             module['name'] = name
             module['version'] = version
+            module['updated'] = datetime.now()
     return module_list
 
 
@@ -91,7 +92,10 @@ async def delete(
     for module in module_list:
         if module['id'] == id:
             if module['status'] == 'START':
-                module['task'].cancel()
+                try:
+                    module['task'].cancel()
+                except asyncio.CancelledError:
+                    pass
             module_list.remove(module)
     return module_list
 
@@ -109,6 +113,7 @@ async def start(
             task.add_done_callback(functools.partial(ai_module_callback, id=id, name=name))
             module['task'] = task
             module['status'] = 'START'
+            module['updated'] = datetime.now()
             return f'{id} 모듈 구동'
     return f'{id} 모듈 구동 실패'
 
@@ -123,5 +128,6 @@ async def stop(
         if module['id'] == id and module['status'] == 'START':
             module['task'].cancel()
             module['status'] = 'STOP'
+            module['updated'] = datetime.now()
             return f'{id} 모듈 정지'
     return f'{id} 모듈 정지 실패'

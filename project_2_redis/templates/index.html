@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>모듈 목록</title>
+    <style>
+        body {
+            background: steelblue;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+        }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+            justify-content: center;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.8);
+            background: white;
+            margin: 0 10px;
+        }
+        .card:hover {
+            cursor: pointer;
+        }
+        .card h3 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 2em;
+            color: mediumpurple;
+        }
+
+        /* 버튼 스타일 */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .button-container button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: mediumpurple;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container button:hover {
+            background-color: darkorchid;
+        }
+
+        .button-container button:first-child {
+            margin-left: 0;
+        }
+
+        .button-container button:last-child {
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>모듈 목록</h1>
+    <br>
+    <div id="card-container" class="card-container"></div>
+
+    <script>
+        async function fetchModules() {
+            try {
+                const response = await fetch('/api/ai'); // API 엔드포인트를 적절히 변경하세요
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 올바르지 않습니다');
+                }
+                const data = await response.json();
+                displayModules(data);
+            } catch (error) {
+                console.error('데이터를 가져오는 중 오류 발생:', error);
+            }
+        }
+
+        function displayModules(modules) {
+            const container = document.getElementById('card-container');
+            modules.forEach(module => {
+                const {id, name, version, status, inserted, updated} = module;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>${name}</h3>
+                    <p><b>♧ ID</b>: ${id}</p>
+                    <p><b>♧ 버전</b>: ${version}</p>
+                    <p><b>♧ 상태</b>: ${status}</p>
+                    <p><b>♧ 등록일자</b>: ${inserted.substring(0,10)}</p>
+                    <p><b>♧ 수정일자</b>: ${updated.substring(0,10)}</p>
+                    <div class="button-container">
+                        <button onclick="moduleAction('start', '${id}', '${name}')">구동</button>
+                        <button onclick="moduleAction('stop', '${id}', '${name}')">정지</button>
+                        <button onclick="moduleAction('delete', '${id}', '${name}')">삭제</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 모듈 액션 함수 정의
+        async function moduleAction(action, id, name) {
+            let url = '';
+            let url_del = '';
+            if (action == 'start' || action == 'stop') {
+                url = `/api/ai/${action}/${id}`;
+            } else if (action == 'delete') {
+                url = `/api/ai/stop/${id}`;
+                url_del = `/api/ai/${id}`;
+            }
+
+            try {
+                const response = await fetch(url, { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error('API 요청 실패');
+                }
+                await response.json();
+
+                if (action == 'delete') {
+                    const response = await fetch(url_del, { method: 'DELETE' });
+                    if (!response.ok) {
+                        throw new Error('API 요청 실패');
+                    }
+                    await response.json();
+                }
+                // 성공 후 필요한 작업 (예: 페이지 새로고침)
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`${name} 모듈 ${action} 실패: ${error.message}`);
+            }
+        }
+
+        fetchModules();
+    </script>
+</body>
+</html>
