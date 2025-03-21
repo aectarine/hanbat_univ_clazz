@@ -3,49 +3,53 @@ import functools
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Path, Body
 
-from module.ai_module import ai_module, ai_module_callback
+from project_1.module.ai_module import ai_module, ai_module_callback
 
-router = APIRouter(prefix='/ai')
+ai_router = APIRouter(prefix='/ai')
 
 module_list = list()
 
 
+# 1. 모듈 조회
 # GET http://localhost:8000/api/ai
-@router.get('')
+@ai_router.get('')
 async def find_all():
-    result = [
+    return [
         {
             'id': module['id'],
             'name': module['name'],
             'version': module['version'],
-            'status': module['status'],
+            'status': 'STOP',
             'inserted': module['inserted'],
             'updated': module['updated']
         } for module in module_list
     ]
-    return result
 
 
+# 2. 모듈 단일 조회
 # GET http://localhost:8000/api/ai/{id}
-# GET http://localhost:8000/api/ai/1
-@router.get('/{id}')
-async def find_one(id: str):
+@ai_router.get('/{id}')
+async def find_one(
+        id: str = Path(...)
+):
     for module in module_list:
         if module['id'] == id:
             return {
                 'id': module['id'],
                 'name': module['name'],
                 'version': module['version'],
-                'status': module['status'],
+                'status': 'STOP',
                 'inserted': module['inserted'],
                 'updated': module['updated']
             }
 
 
+# 3. 모듈 등록
 # POST http://localhost:8000/api/ai
-@router.post('')
+# BODY: name={name}&version={version}
+@ai_router.post('')
 async def create(
         name: str = Body(...),
         version: str = Body(...)
@@ -63,38 +67,41 @@ async def create(
     return module_list
 
 
+# 4. 모듈 수정
 # PUT http://localhost:8000/api/ai/{id}
-# PUT http://localhost:8000/api/ai/1
-@router.put('/{id}')
+@ai_router.put('/{id}')
 async def modify(
-        id: str,
+        id: str = Path(...),
         name: str = Body(...),
         version: str = Body(...)
 ):
-    for ai in module_list:
-        if ai['id'] == id:
-            ai['name'] = name
-            ai['version'] = version
-            ai['updated'] = datetime.now()
+    for module in module_list:
+        if module['id'] == id:
+            module['name'] = name
+            module['version'] = version
     return module_list
 
 
-# DELETE http://localhost:8000/api/ai?id={id}
-# DELETE http://localhost:8000/api/ai?id=1
-@router.delete('')
-async def remove(
-        id: str = Query(...)
+# 5. 모듈 삭제
+# DELETE http://localhost:8000/api/ai/{id}
+@ai_router.delete('/{id}')
+async def delete(
+        id: str = Path(...)
 ):
-    for ai in module_list:
-        if ai['id'] == id:
-            module_list.remove(ai)
+    for module in module_list:
+        if module['id'] == id:
+            if module['status'] == 'START':
+                module['task'].cancel()
+            module_list.remove(module)
     return module_list
 
 
-# GET http://localhost:8000/api/ai/start/{id}
-# GET http://localhost:8000/api/ai/start/1
-@router.get('/start/{id}')
-async def start(id: str):
+# 6. 모듈 구동
+# POST http://localhost:8000/api/ai/start/{id}
+@ai_router.post('/start/{id}')
+async def start(
+        id: str = Path(...)
+):
     for module in module_list:
         if module['id'] == id and module['status'] == 'STOP':
             name = module['name']
@@ -106,14 +113,15 @@ async def start(id: str):
     return f'{id} 모듈 구동 실패'
 
 
-# GET http://localhost:8000/api/ai/stop/{id}
-# GET http://localhost:8000/api/ai/stop/1
-@router.get('/stop/{id}')
-async def stop(id: str):
+# 7. 모듈 정지
+# POST http://localhost:8000/api/ai/stop/{id}
+@ai_router.post('/stop/{id}')
+async def stop(
+        id: str = Path(...)
+):
     for module in module_list:
         if module['id'] == id and module['status'] == 'START':
             module['task'].cancel()
             module['status'] = 'STOP'
-            await asyncio.sleep(0)
             return f'{id} 모듈 정지'
     return f'{id} 모듈 정지 실패'

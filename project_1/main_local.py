@@ -1,18 +1,17 @@
 import uvicorn
 from fastapi import FastAPI, APIRouter
 
+from project_1.controller.ai_controller_local import ai_router
+from project_1.controller.index_controller import index_router
 
 app = FastAPI()
 
-# API 라우터 적용
 api_app = APIRouter(prefix='/api')
 api_app.include_router(ai_router)
 
-# HTML 라우터 적용
 page_app = APIRouter()
 page_app.include_router(index_router)
 
-# FastAPI에 라우터 최종 적용
 app.include_router(api_app)
 app.include_router(page_app)
 

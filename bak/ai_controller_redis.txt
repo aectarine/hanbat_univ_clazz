@@ -1,0 +1,51 @@
+from fastapi import APIRouter
+
+# http://localhost:8000/api/ai
+router = APIRouter(prefix='/ai')
+
+
+# 1. 모듈 전체 조회
+# GET http://localhost:8000/api/ai
+@router.get('')
+async def find_all():
+    return True
+
+
+# 2. 모듈 단일 조회
+# GET http://localhost:8000/api/ai/{id}
+@router.get('/{id}')
+async def find_one(id: str):
+    pass
+
+
+@router.post('')
+async def create():
+    pass
+
+
+# 3. 모듈 수정
+# PUT http://localhost:8000/api/ai/{id}
+@router.put('/{id}')
+async def modify(id: str):
+    pass
+
+
+# 4. 모듈 삭제
+# DELETE http://localhost:8000/api/ai/{id}
+@router.delete('/{id}')
+async def delete(id: str):
+    pass
+
+
+# 5. 모듈 구동
+# POST http://localhost:8000/api/ai/start/{id}
+@router.post('/start/{id}')
+async def start():
+    pass
+
+
+# 6. 모듈 정지
+# POST http://localhost:8000/api/ai/stop/{id}
+@router.post('/stop/{id}')
+async def stop():
+    pass

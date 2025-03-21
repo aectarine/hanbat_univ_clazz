@@ -8,7 +8,7 @@ async def ai_module(id: int, name: str):
     for i in range(0, 1000000000):  # 숫자를 줄여서 예시
         if i % 1000000 == 0:
             print(f'===> {id}번 {name} 모듈 구동 중...')
-        await asyncio.sleep(0)  # I/O 대기 중에 CPU를 풀어줌
+        await asyncio.sleep(0)
     print(f'===> {id}번 {name} 모듈 구동 완료...')
 
 
