@@ -98,8 +98,8 @@
                     <p><b>♧ ID</b>: ${id}</p>
                     <p><b>♧ 버전</b>: ${version}</p>
                     <p><b>♧ 상태</b>: ${status}</p>
-                    <p><b>♧ 등록일자</b>: ${inserted.substring(0,10)}</p>
-                    <p><b>♧ 수정일자</b>: ${updated.substring(0,10)}</p>
+                    <p><b>♧ 등록일자</b>: ${formatDateToKoreanTime(inserted)}</p>
+                    <p><b>♧ 수정일자</b>: ${formatDateToKoreanTime(updated)}</p>
                     <div class="button-container">
                         <button onclick="moduleAction('start', '${id}', '${name}')">구동</button>
                         <button onclick="moduleAction('stop', '${id}', '${name}')">정지</button>
@@ -142,8 +142,21 @@
                 alert(`${name} 모듈 ${action} 실패: ${error.message}`);
             }
         }
+        function formatDateToKoreanTime(isoDate) {
+            const date = new Date(isoDate);
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            const second = String(date.getSeconds()).padStart(2, '0');
+
+            return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+        }
 
         fetchModules();
+
     </script>
 </body>
 </html>

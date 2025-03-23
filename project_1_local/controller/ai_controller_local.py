@@ -21,7 +21,7 @@ async def find_all():
             'id': module['id'],
             'name': module['name'],
             'version': module['version'],
-            'status': 'STOP',
+            'status': module['status'],
             'inserted': module['inserted'],
             'updated': module['updated']
         } for module in module_list
@@ -40,7 +40,7 @@ async def find_one(
                 'id': module['id'],
                 'name': module['name'],
                 'version': module['version'],
-                'status': 'STOP',
+                'status': module['status'],
                 'inserted': module['inserted'],
                 'updated': module['updated']
             }
