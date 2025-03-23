@@ -142,6 +142,8 @@
 ![img.png](imgs/img_2_3.png)
 ## 3-3. main_redis.py 실습
 
+# 4. JMeter 실습
+## 4-1. 프로그램 설치
 
 * OpenJDK 17 
   * 다운로드: https://jdk.java.net/java-se-ri/17-MR1
