@@ -210,6 +210,12 @@
     include ../my_config/config.conf;
     ```
 
+# 5. PM2, 도커 스웜
+## 5-1. 참고
+### PM2와 도커 스웜은 실습 생략
+
+## 5-2. 프로그램 설치
+
 * PM2 (실습X)
   * NodeJS 설치: https://nodejs.org/ko/download
   * PM2 설치: cmd -> npm i pm2 -g

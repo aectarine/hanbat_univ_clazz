@@ -10,4 +10,4 @@ COPY . .
 
 CMD ["sh", "-c", "python main.py"]
 
-#CMD ["sh", "-c", "cd /app && python main.py"]
+#CMD ["sh", "-c", "cd /app && python main_redis.py"]
