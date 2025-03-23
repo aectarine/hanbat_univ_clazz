@@ -1,15 +1,15 @@
 from fastapi import APIRouter
 from fastapi.requests import Request
 
-router = APIRouter(prefix='/nginx')
+nginx_router = APIRouter(prefix='/nginx')
 
 
-@router.get('')
+@nginx_router.get('')
 async def health():
     return {'status': 'OK'}
 
 
-@router.get('/test')
+@nginx_router.get('/t1')
 async def test(request: Request):
     host = request.client.host
     port = request.client.port
@@ -23,7 +23,7 @@ async def test(request: Request):
     }
 
 
-@router.get('/test2')
+@nginx_router.get('/t2')
 async def test2(request: Request):
     host = request.headers.get("X-Real-IP") or request.client.host
     port = request.headers.get("X-Real-Port") or request.client.port

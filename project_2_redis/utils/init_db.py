@@ -1,3 +1,4 @@
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -13,17 +14,19 @@ async def init_db():
     try:
         async with ENGINE.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            print('DB 연결 및 테이블 생성 완료')
-    except Exception as e:
+        print('DB 연결 및 테이블 생성 완료')
+    except SQLAlchemyError as e:
         print(f'DB 연결 중 오류: {e}')
+        raise
 
 
 async def get_db():
     async with AsyncSessionLocal() as session:
         try:
             yield session
-        except Exception as e:
-            print(f'DB 연결중 오류: {e}')
+        except SQLAlchemyError as e:
+            await session.rollback()
+            print(f'DB 세션 오류: {e}')
             raise
         finally:
             await session.close()

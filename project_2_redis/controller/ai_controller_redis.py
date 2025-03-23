@@ -1,18 +1,19 @@
 import asyncio
 import functools
-import uuid
-from datetime import datetime
 
-from fastapi import APIRouter, Path, Body, Depends, HTTPException, status as res_status
+from fastapi import APIRouter, Path, Depends, HTTPException, status as res_status
+from redis.asyncio.client import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from project_1_local.module.ai_module import ai_module_callback
 from project_2_redis.domain.ai_module_request import AIModuleRequest
 from project_2_redis.domain.ai_module_response import AIModuleResponse
+from project_2_redis.model.enums import StatusType
 from project_2_redis.model.models import AI_Module
-from project_2_redis.module.ai_module import ai_module
+from project_2_redis.module.ai_module import ai_module, ai_module_tasks
 from project_2_redis.utils.init_db import get_db
+from project_2_redis.utils.init_redis import get_redis
 
 ai_router = APIRouter(prefix='/ai')
 
@@ -32,10 +33,13 @@ async def find_all(
 # GET http://localhost:8000/api/ai/{id}
 @ai_router.get('/{id}')
 async def find_one(
-        id: str = Path(...),
+        id: int = Path(...),
         db: AsyncSession = Depends(get_db)
 ):
-    module = await db.execute(select(AI_Module).where(AI_Module.id == id).order_by(AI_Module.id.asc()))
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id).order_by(AI_Module.id.asc()))
+    module = rs.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 없습니다')
     return AIModuleResponse.model_validate(module)
 
 
@@ -51,7 +55,6 @@ async def create(
 ):
     name = ai_module_request.name
     version = ai_module_request.version
-
     module = AI_Module(name=name, version=version)
     db.add(module)
     await db.commit()
@@ -59,19 +62,17 @@ async def create(
     return AIModuleResponse.model_validate(module)
 
 
-# 4. 모듈 수정
-# PUT http://localhost:8000/api/ai/{id}
 @ai_router.put('/{id}')
 async def modify(
-        id: str = Path(...),
+        id: int = Path(...),
         # name: str = Body(...),
         # version: str = Body(...)
-        ai_module_request: AIModuleRequest,
+        ai_module_request: AIModuleRequest = None,
         db: AsyncSession = Depends(get_db)
 ):
     rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
     module = rs.scalar_one_or_none()
-    if not module:
+    if module is None:
         raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 없습니다')
     module.name = ai_module_request.name
     module.version = ai_module_request.version
@@ -80,51 +81,70 @@ async def modify(
     return AIModuleResponse.model_validate(module)
 
 
+# 4. 모듈 수정
+# PUT http://localhost:8000/api/ai/{id}
+
+
 # 5. 모듈 삭제
 # DELETE http://localhost:8000/api/ai/{id}
 @ai_router.delete('/{id}')
 async def delete(
-        id: str = Path(...)
+        id: int = Path(...),
+        db: AsyncSession = Depends(get_db),
+        redis: Redis = Depends(get_redis)
 ):
-    for module in module_list:
-        if module['id'] == id:
-            if module['status'] == 'START':
-                try:
-                    module['task'].cancel()
-                except asyncio.CancelledError:
-                    pass
-            module_list.remove(module)
-    return module_list
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
+    module = rs.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 없습니다')
+
+    if module.status == StatusType.START:
+        await redis.publish(f'AI_MODULE', f'{id}:STOP')
+        await db.delete(module)
+        await db.commit()
+    return AIModuleResponse.model_validate(module)
 
 
 # 6. 모듈 구동
 # POST http://localhost:8000/api/ai/start/{id}
 @ai_router.post('/start/{id}')
 async def start(
-        id: str = Path(...)
+        id: int = Path(...),
+        db: AsyncSession = Depends(get_db)
 ):
-    for module in module_list:
-        if module['id'] == id and module['status'] == 'STOP':
-            name = module['name']
-            task = asyncio.create_task(ai_module(id, name))
-            task.add_done_callback(functools.partial(ai_module_callback, id=id, name=name))
-            module['task'] = task
-            module['status'] = 'START'
-            module['updated'] = datetime.now()
-            return f'{id} 모듈 구동'
-    return f'{id} 모듈 구동 실패'
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
+    module = rs.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 없습니다')
+    name = module.name
+
+    # STOP 상태는 모든 서버의 ai_module_tasks에 해당 id의 task가 모두 없는 상태
+    if module.status == StatusType.STOP:
+        task = asyncio.create_task(ai_module(id, name))
+        task.add_done_callback(functools.partial(ai_module_callback, id=id, name=name))
+        ai_module_tasks[id] = task
+        module.status = StatusType.START
+        await db.commit()
+        return f'{id}번 모듈 구동 성공'
+    return f'{id}번 모듈 구동 실패'
 
 
 # 7. 모듈 정지
 # POST http://localhost:8000/api/ai/stop/{id}
 @ai_router.post('/stop/{id}')
 async def stop(
-        id: str = Path(...)
+        id: int = Path(...),
+        db: AsyncSession = Depends(get_db),
+        redis: Redis = Depends(get_redis)
 ):
-    for module in module_list:
-        if module['id'] == id and module['status'] == 'START':
-            module['task'].cancel()
-            module['status'] = 'STOP'
-            module['updated'] = datetime.now()
-            return f'{id} 모듈 정지'
-    return f'{id} 모듈 정지 실패'
+    rs = await db.execute(select(AI_Module).where(AI_Module.id == id))
+    module = rs.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=res_status.HTTP_404_NOT_FOUND, detail=f'{id}번 모듈이 없습니다')
+
+    if module.status == StatusType.START:
+        await redis.publish(f'AI_MODULE', f'{id}:STOP')
+        module.status = StatusType.STOP
+        await db.commit()
+        return f'{id}번 모듈 정지 성공'
+    return f'{id}번 모듈 정지 실패'
