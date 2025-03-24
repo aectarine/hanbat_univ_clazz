@@ -301,11 +301,12 @@
     * 특정 이미지의 컨테이너 삭제
     * docker rm $(docker ps -a --filter ancestor=<이미지명>:<태그>)
 
-
-컨테이너 IP 확인: docker inspect 46c5
-docker run -d --name local_postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
-docker run -d --name local_redis -p 6379:6379 redis:latest
-docker run -d --name local_hanbat -p 8000:8000 hanbat:latest
+  ```
+    컨테이너 IP 확인: docker inspect 46c5
+      docker run -d --name local_postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 postgres:latest
+      docker run -d --name local_redis -p 6379:6379 redis:latest
+      docker run -d --name local_hanbat -p 8000:8000 hanbat:latest
+  ```
 
 # 6. 참고
 ## 6-1. 참고 프로그램
