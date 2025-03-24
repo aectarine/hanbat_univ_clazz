@@ -308,8 +308,21 @@ docker run -d --name local_redis -p 6379:6379 redis:latest
 docker run -d --name local_hanbat -p 8000:8000 hanbat:latest
 
 # 6. 참고
-
-## 6-1. 참고 사이트
+## 6-1. 참고 프로그램
+  * Pigma: 디자인 및 프로그램 포트폴리오 작성 도구
+    * https://www.figma.com/ko-kr/
+  * Mermaid: 다이어그램 및 차트 작성 도구
+    * https://mermaid.js.org/
+  * DBDiagram: DB ERD 작성 및 테이블 생성 도구 (무료. 커맨드를 이용)
+    * https://dbdiagram.io/home
+  * eXERD: DB ERD 작성 도구 (30일 무료, 쉬운 사용)
+    * https://www.exerd.com/index.do
+  * PyCharm: 파이썬 에디터 (유료. 다양한 편의 기능. 대학 이메일 계정 연동시 1년 무료 및 연장)
+    * https://www.jetbrains.com/ko-kr/pycharm
+  * JIRA: 프로젝트 이슈 및 일정 관리도구
+    * https://www.atlassian.com/ko/software/jira
+    
+## 6-2. 참고 사이트
   * TIOBE: 인기언어 지표 순위 사이트
     * https://www.tiobe.com/tiobe-index/
   * TechEmpower: 웹 프레임워크 비교 순위 사이트
@@ -324,17 +337,7 @@ docker run -d --name local_hanbat -p 8000:8000 hanbat:latest
     * https://letspl.me/
   * 홀라월드: 사이드 프로젝트 관련 사이트
     * https://holaworld.io/
+  * 깃 학습: Git 학습 사이트
+    * https://learngitbranching.js.org/?locale=ko
 
-## 6-2. 참고 프로그램
-  * Pigma: 디자인 및 프로그램 포트폴리오 작성 도구
-    * https://www.figma.com/ko-kr/
-  * Mermaid: 다이어그램 및 차트 작성 도구
-    * https://mermaid.js.org/
-  * DBDiagram: DB ERD 작성 및 테이블 생성 도구 (무료. 커맨드를 이용)
-    * https://dbdiagram.io/home
-  * eXERD: DB ERD 작성 도구 (30일 무료, 쉬운 사용)
-    * https://www.exerd.com/index.do
-  * PyCharm: 파이썬 에디터 (유료. 다양한 편의 기능. 대학 이메일 계정 연동시 1년 무료 및 연장)
-    * https://www.jetbrains.com/ko-kr/pycharm
-  * JIRA: 프로젝트 이슈 및 일정 관리도구
-    * https://www.atlassian.com/ko/software/jira
+
