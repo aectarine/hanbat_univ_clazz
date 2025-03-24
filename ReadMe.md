@@ -80,6 +80,46 @@
     include ../my_config/config.conf;
     ```
     
+  * NginX 로드밸런스 알고리즘 종류 및 적용 방법
+  
+    * 라운드 로빈 (순차 연결)
+    ```
+    upstream my_server {
+      server localhost:8000;
+      server localhost:8001;
+      server localhost:8002;
+    }
+    ```
+    
+    * 가중치 라운드 로빈 (가중치 기준 연결)
+    ```
+    upstream my_server {
+      server localhost:8000 weight=1;
+      server localhost:8001 weight=2;
+      server localhost:8002 weight=3;
+    }    
+    ```
+    
+    * 최소 연결
+    ```
+    upstream my_server {
+      least_conn;
+      server localhost:8000;
+      server localhost:8001;
+      server localhost:8002;
+    }
+    ```
+  
+    * 최소 시간 연결 (유료 버전만 사용 가능)
+    ```
+    upstream my_server {
+      least_time first_byte;
+      server localhost:8000;
+      server localhost:8001;
+      server localhost:8002;
+    }
+    ```
+    
 ## 2-3. 로드밸런스 구조
 ![img.png](imgs/img_1_1.png)
 ![img.png](imgs/img_2_1.png)
@@ -160,89 +200,10 @@
 * JMETER: 5.1.1
   * 다운로드: https://archive.apache.org/dist/jmeter/binaries/
   * 실행: apache-jmeter-5.1.1/bin -> jmeter.bat 실행
-
-
-* NGINX: 1.27.4
-  * 다운로드: https://nginx.org/en/download.html
-  * 실행: nginx-1.27.4 -> 상단 경로 클릭 -> cmd 입력 -> nginx 입력 및 실행
-  * 중지: nginx -s stop
-  * 설정: 
-    * my_config 폴더 생성 -> 마우스 우클릭 -> 새로 만들기 -> 텍스트 문서 -> 새 텍스트 문서.txt 를 config.conf 로 변경
-    * config.conf 우클릭 -> 메모장에서 편집 -> 아래 내용 입력 및 저장
-    ```
-      upstream my_server {
-        least_conn;
-        server localhost:8000;
-        server localhost:8001;
-        server localhost:8002;
-      }
-
-      server {
-        listen 8010;
-        server_name localhost;
-  
-        location / {
-          proxy_pass http://my_server;
-          
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Real-Port $remote_port;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-NginX-Proxy true;
-
-          # 타임아웃 설정 추가
-          proxy_connect_timeout 300;
-          proxy_send_timeout 300;
-          proxy_read_timeout 300;
-          
-          # 버퍼 크기 설정
-          proxy_buffer_size 128k;
-          proxy_buffers 4 256k;
-          proxy_busy_buffers_size 256k;
-          
-          # 프록시 응답 버퍼링 활성화
-          proxy_buffering on;
-      }
-    }
-    ```
-    * nginx-1.27.4 -> conf 폴더 이동 -> nginx.conf 우클릭 -> 메모장에서 편집 -> 맨 하단 } 윗줄에 다음 추가
-    ```
-    include ../my_config/config.conf;
-    ```
-    * 라운드 로빈 (순차 연결)
-    ```
-      upstream my_server {
-        server localhost:8000;
-        server localhost:8001;
-        server localhost:8002;
-      }
-    ```
-    * 가중치 라운드 로빈 (가중치 기준 연결)
-    ```
-      upstream my_server {
-        server localhost:8000 weight=1;
-        server localhost:8001 weight=2;
-        server localhost:8002 weight=3;
-      }    
-    ```
-    * 최소 연결
-    ```
-      upstream my_server {
-        least_conn;
-        server localhost:8000;
-        server localhost:8001;
-        server localhost:8002;
-      }
-    ```
-    * 최소 시간 연결 (유료 버전만 사용 가능)
-    ```
-      upstream my_server {
-        least_time first_byte;
-        server localhost:8000;
-        server localhost:8001;
-        server localhost:8002;
-      }
-    ```
+  ![img.png](imgs/img_4_1.png)
+  ![img.png](imgs/img_4_2.png)
+  ![img.png](imgs/img_4_3.png)
+  ![img.png](imgs/img_4_4.png)
 
 # 5. PM2, 도커 스웜
 ## 5-1. 참고
