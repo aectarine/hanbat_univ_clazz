@@ -172,9 +172,9 @@
     ```
       upstream my_server {
         least_conn;
+        server localhost:8000;
         server localhost:8001;
         server localhost:8002;
-        server localhost:8003;
       }
 
       server {
@@ -208,6 +208,40 @@
     * nginx-1.27.4 -> conf 폴더 이동 -> nginx.conf 우클릭 -> 메모장에서 편집 -> 맨 하단 } 윗줄에 다음 추가
     ```
     include ../my_config/config.conf;
+    ```
+    * 라운드 로빈 (순차 연결)
+    ```
+      upstream my_server {
+        server localhost:8000;
+        server localhost:8001;
+        server localhost:8002;
+      }
+    ```
+    * 가중치 라운드 로빈 (가중치 기준 연결)
+    ```
+      upstream my_server {
+        server localhost:8000 weight=1;
+        server localhost:8001 weight=2;
+        server localhost:8002 weight=3;
+      }    
+    ```
+    * 최소 연결
+    ```
+      upstream my_server {
+        least_conn;
+        server localhost:8000;
+        server localhost:8001;
+        server localhost:8002;
+      }
+    ```
+    * 최소 시간 연결 (유료 버전만 사용 가능)
+    ```
+      upstream my_server {
+        least_time first_byte;
+        server localhost:8000;
+        server localhost:8001;
+        server localhost:8002;
+      }
     ```
 
 # 5. PM2, 도커 스웜
