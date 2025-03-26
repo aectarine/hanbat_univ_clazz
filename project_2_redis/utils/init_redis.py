@@ -42,7 +42,7 @@ async def redis_listener():
         await pubsub.subscribe('AI_MODULE')
 
         while True:
-            msg = await pubsub.get_message(ignore_subscribe_messages=True)
+            msg = await pubsub.get_message(ignore_subscribe_messages=True, timeout=0.1)
             if msg:
                 print(f'수신 데이터: {msg}')
                 datas = msg['data'].split(':')
@@ -53,7 +53,6 @@ async def redis_listener():
                     if status == StatusType.STOP.value:
                         task.cancel()
                         ai_module_tasks.pop(id, None)
-            await asyncio.sleep(0.001)
     except Exception as e:
         print(f'Redis 리스너 오류 발생: {e}')
     finally:
