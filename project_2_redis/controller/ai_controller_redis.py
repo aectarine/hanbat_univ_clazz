@@ -118,8 +118,8 @@ async def delete(
 
     if module.status == StatusType.START:
         await redis.publish(f'AI_MODULE', f'{id}:STOP')
-        await db.delete(module)
-        await db.commit()
+    await db.delete(module)
+    await db.commit()
     return AIModuleResponse.model_validate(module)
 
 
