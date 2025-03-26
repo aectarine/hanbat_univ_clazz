@@ -6,7 +6,7 @@ from redis.asyncio.client import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from project_1_local.module.ai_module import ai_module_callback
+from project_2_redis.module.ai_module import ai_module_callback
 from project_2_redis.domain.ai_module_request import AIModuleRequest
 from project_2_redis.domain.ai_module_response import AIModuleResponse
 from project_2_redis.model.enums import StatusType
@@ -16,6 +16,26 @@ from project_2_redis.utils.init_db import get_db
 from project_2_redis.utils.init_redis import get_redis
 
 ai_router = APIRouter(prefix='/ai')
+
+
+# 0. 모듈 조회 (+ 페이징)
+# GET http://localhost:8000/api/ai
+# GET http://localhost:8000/api/ai?page=1&size=10 [+ 페이징]
+# GET http://localhost:8000/api/ai?page=1&size=10&sort=id:asc [+ 페이징 + 정렬]
+# @ai_router.get('')
+# async def find_all(
+#         page: Optional[int] = Query(default=None, ge=1),
+#         size: Optional[int] = Query(default=None, ge=1, le=100),
+#         db: AsyncSession = Depends(get_db)
+# ):
+#     query = select(AI_Module).order_by(AI_Module.id.asc())
+#     if page and size:
+#         offset = (page - 1) * size
+#         query = query.offset(offset).limit(size)
+#     # 이 코드는 정렬 기능 커스텀은 구현되지 않음
+#     rs = await db.execute(query)
+#     module_list = rs.scalars().all()
+#     return [AIModuleResponse.model_validate(module) for module in module_list]
 
 
 # 1. 모듈 조회
