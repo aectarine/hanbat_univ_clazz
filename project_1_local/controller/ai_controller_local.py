@@ -15,6 +15,7 @@ module_list = list()
 # 1. 모듈 조회
 # GET http://localhost:8000/api/ai
 @ai_router.get('')
+# def find_all(): - API, DB, File 등 I/O 작업이 없거나, await 를 사용하는 비동기 함수가 없는경우 def 사용 가능
 async def find_all():
     return [
         {

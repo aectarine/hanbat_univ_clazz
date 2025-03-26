@@ -62,6 +62,8 @@ async def create(
     return AIModuleResponse.model_validate(module)
 
 
+# 4. 모듈 수정
+# PUT http://localhost:8000/api/ai/{id}
 @ai_router.put('/{id}')
 async def modify(
         id: int = Path(...),
@@ -79,10 +81,6 @@ async def modify(
     await db.commit()
     await db.refresh(module)
     return AIModuleResponse.model_validate(module)
-
-
-# 4. 모듈 수정
-# PUT http://localhost:8000/api/ai/{id}
 
 
 # 5. 모듈 삭제
